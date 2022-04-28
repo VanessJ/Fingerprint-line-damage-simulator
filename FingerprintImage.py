@@ -84,7 +84,9 @@ class FingerprintImage:
         for c in range(0, len(contours)):
             cv.drawContours(self.fingerprint_mask, contours, c, 255, -1)
 
+
     def get_fingerprint_size(self):
+
         """
         @brief: fingerprint area is wrapped in bounding rectangle and fingerprint width and height are aproximated
         by this rectangle

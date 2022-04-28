@@ -265,7 +265,6 @@ def soak_of_circle_area(image_operation: ImageOperation, center_y, center_x, rad
 
                 norm_cords = image_operation.get_norm_cords_from_image_cords_in_area(y, x, center_y, center_x, radius)
                 if norm_cords == -1:
-                    print("Toto tu")
                     return
 
                 if norm_cords[0] ** 2 + norm_cords[1] ** 2 < 1:

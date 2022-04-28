@@ -64,7 +64,6 @@ class HairGenerator(Generator):
         :return:
         """
         self.set_length_type(length_type)
-
         while True:
             start_point, end_point, control_point = self.get_start_end_and_control_point()
 
@@ -114,7 +113,7 @@ class HairGenerator(Generator):
         """
         opacity_damage_level = rnd.randrange(1, 6)
         for p in self.points:
-            x = rnd.randrange(0, 10)
+            x = rnd.randrange(0, 15)
             if x < opacity_damage_level:
                 cv.circle(self.background, p, 1, (255, 0, 255), -1)
 
