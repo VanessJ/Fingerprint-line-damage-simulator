@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------------
+# Created By  : Vanessa Jóriová
+# Date        : 8.5.2022
+# Version     : 1.0
+
 import math
 import numpy as np
 import cv2 as cv

@@ -1,10 +1,17 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------------
+# Created By  : Vanessa Jóriová
+# Date        : 8.5.2022
+# Version     : 1.0
+
 import argparse
 import os
 import random
-import sys
 
 import cv2
 
+from PIL import Image
 from FingerprintImage import FingerprintImage
 from ScarGenerator import ScarGenerator
 from ImageDistortion import *
@@ -14,6 +21,9 @@ from LineGenerator import LineGenerator, LineOrientation, LineLength, LineThickn
 
 
 class ArgParser:
+    """
+    Class parsing user input and generating synthetic damage into synthetic fingerprints
+    """
 
     def __init__(self):
         self.parser = argparse.ArgumentParser(add_help=False)
@@ -25,6 +35,11 @@ class ArgParser:
         self.amount = None
 
     def add_args(self):
+        """
+
+        @brief: Configuration of all the available arguments
+        :return: None
+        """
         self.parser.add_argument("--help", "-h", action="store_true", help=argparse.SUPPRESS)
         self.parser.add_argument("--save", "-s", action="store", type=str, dest="save")
         self.parser.add_argument("--image", "-img", action="store", type=str, dest="image")
@@ -53,9 +68,20 @@ class ArgParser:
 
     @staticmethod
     def is_valid_directory(path):
+        """
+
+        @brief: checks if path to directory is valid
+        :param path: path to directory
+        :return: True if path to directory is valid, False if not
+        """
         return os.path.isdir(path)
 
     def configure_save_folder(self):
+        """
+
+        @brief: sets folder to save generated images. If given folder does not exist, folder is created
+        :return: None
+        """
         if self.args.save:
             if self.is_valid_directory(self.args.save):
                 self.save_folder = self.args.save
@@ -69,6 +95,12 @@ class ArgParser:
                 pass
 
     def configure_image(self):
+        """
+
+        @brief: checks if image received by user arguments is valid and sets it as fingerprint image in which damage
+                will be generated
+        :return: None
+        """
         if self.args.image:
             if os.path.isfile(self.args.image):
                 self.image = self.args.image
@@ -77,6 +109,12 @@ class ArgParser:
                 os._exit(-1)
 
     def configure_directory(self):
+        """
+
+        @brief: checks if directory with images received by user arguments is valid and sets it as directory from which
+        images of fingerprints will be chosen randomly
+        :return: None
+        """
         if self.args.directory:
             if self.is_valid_directory(self.args.directory):
                 self.directory = self.args.directory
@@ -85,16 +123,33 @@ class ArgParser:
                 os._exit(-1)
 
     def configure_name(self):
+        """
+
+        @brief: Sets name of generated images
+        :return: None
+        """
         if self.args.name:
             self.name = self.args.name
 
     def configure_amount(self):
+        """
+
+        @brief: Sets number of images generated. If not specified, default value is 1
+        :return: None
+        """
         if self.args.amount:
             self.amount = self.args.amount
         else:
             self.amount = 1
 
     def configure_basic_arguments(self):
+        """
+
+        @brief: Gets information from user arguments necessary for generating and saving image - image of synthetic
+                fingerprint or directory containing synthetic fingerprints, name of generated picture, amount of these
+                pictures and folder in which the image will be saved.
+        :return: None
+        """
         self.configure_save_folder()
         self.configure_image()
         self.configure_directory()
@@ -105,6 +160,11 @@ class ArgParser:
         self.configure_amount()
 
     def get_damage_type(self):
+        """
+
+        @brief: Chooses which type of damage will be generated depending on user input
+        :return: None
+        """
         if self.args.creases:
             self.generate_creases()
         if self.args.scar:
@@ -113,6 +173,13 @@ class ArgParser:
             self.generate_hair()
 
     def save_image(self, image, number):
+        """
+
+        @brief: Saves image in JPG format
+        :param image: Image that will be saved as array
+        :param number: Number of generated images as integer
+        :return: None
+        """
         if self.save_folder:
             save_folder = self.save_folder
         else:
@@ -121,11 +188,19 @@ class ArgParser:
             name = self.name
         else:
             name = "damaged_fingerprint"
-        image_name = name + str(number) + '.png'
+        image_name = name + str(number) + '.JPG'
         print(f"Saving {image_name}")
-        cv.imwrite(os.path.join(save_folder, image_name), image)
+        image = cv.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+        pil_image = Image.fromarray(image)
+        pil_image.save(os.path.join(save_folder, image_name), dpi=(120, 120))
 
     def generate_creases(self):
+        """
+
+        @brief: Generates creases into synthetic fingerprint
+        :return: None
+        """
         if self.args.level:
             level = self.args.level
         else:
@@ -142,6 +217,11 @@ class ArgParser:
             self.save_image(wrinkle_generator.generated_image, i+1)
 
     def get_fingerprint_image(self):
+        """
+
+        @brief: chooses image in which damage will be generated depending on parameters
+        :return: fingerprint image as array
+        """
         if self.image:
             image = self.image
         else:
@@ -152,6 +232,12 @@ class ArgParser:
 
     @staticmethod
     def parse_scar_length(length):
+        """
+
+        @brief: parses string to LineLength enum equivalent
+        :param length: short, medium, or long as string
+        :return: LineLength enum instance
+        """
         if length == "long":
             return LineLength.LONG
         elif length == "short":
@@ -161,6 +247,12 @@ class ArgParser:
 
     @staticmethod
     def parse_scar_orientation(orientation):
+        """
+
+        @brief: parses string to LineOrientation enum equivalent
+        :param orientation: horizontal, vertical, or diagonal as string
+        :return: LineOrientation enum instance
+        """
         if orientation == "horizontal":
             return LineOrientation.HORIZONTAL
         elif orientation == "vertical":
@@ -170,6 +262,12 @@ class ArgParser:
 
     @staticmethod
     def parse_scar_width(width):
+        """
+
+        @brief: Parses string to LineThickness enum equivalent
+        :param width: Thin, medium, or thick as string
+        :return: LineThickness enum instance
+        """
         if width == "thick":
             return LineThickness.THICK
         elif width == "medium":
@@ -178,6 +276,11 @@ class ArgParser:
             return LineThickness.THIN
 
     def generate_scar(self):
+        """
+
+        @brief: Generates scar into synthetic fingerprint image
+        :return: None
+        """
         for i in range(0, self.amount):
             if self.args.length:
                 scar_length = self.args.length
@@ -197,10 +300,27 @@ class ArgParser:
             scar_length = self.parse_scar_length(scar_length)
             scar_width = self.parse_scar_width(scar_width)
             scar_orientation = self.parse_scar_orientation(scar_orientation)
+
+            if self.args.outline:
+                scar_generator.black_outline = True
+            if self.args.patches:
+                scar_generator.artifacts = True
+            if self.args.distortion:
+                scar_generator.distortion = True
+
+            if self.args.distortion and scar_width != LineThickness.THIN:
+                print("Distortion of papillary lines is only supported in combination with thin scars")
+                return -1
+
             scar_generator.generate_line(scar_length, scar_orientation, scar_width)
             self.save_image(scar_generator.background, i + 1)
 
     def generate_hair(self):
+        """
+
+        @brief: Generates hair into synthetic fingerprint image
+        :return: None
+        """
         for i in range(0, self.amount):
             if self.args.type:
                 hair_type = self.args.type
@@ -215,6 +335,11 @@ class ArgParser:
             self.save_image(hair_generator.background, i + 1)
 
     def get_arguments(self):
+        """
+
+        @brief: Configures arguments
+        :return: None
+        """
         if self.args.help:
             print("PLACEHOLDER HELP")
             os._exit(0)
@@ -224,6 +349,12 @@ class ArgParser:
 
     @staticmethod
     def choose_random_img_from_directory(directory):
+        """
+
+        @brief: Chooses random image from directory (if there are any valid valid images)
+        :param directory: path to directory
+        :return: Image as array
+        """
         # get all images from file
         images = []
         path = directory

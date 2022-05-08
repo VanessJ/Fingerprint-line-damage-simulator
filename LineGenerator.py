@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------------
+# Created By  : Vanessa Jóriová
+# Date        : 8.5.2022
+# Version     : 1.0
+
 from Generator import Generator
 
 import math
@@ -48,6 +55,7 @@ class LineGenerator(Generator):
         self.damage_canvas = None
         self.max_width = None
 
+
     @staticmethod
     def distance(point_1, point_2):
         """
@@ -89,6 +97,7 @@ class LineGenerator(Generator):
                       thickness=LineThickness.RANDOM):
         """
 
+        @brief: Generates line specified by parameters
         :param length_type: LineLength enum value
         :param orientation: LineOrientation enum value
         :param thickness:   LineThickness enum value
@@ -358,7 +367,7 @@ class LineGenerator(Generator):
 
             # avoiding infinite cycling if method fails to generate line of given length and angle
             if counter > 100:
-                return -1
+                return -1, -1
 
         return (x1, y1), (x2, y2)
 
